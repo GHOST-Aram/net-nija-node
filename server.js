@@ -1,6 +1,20 @@
 const http = require('node:http')
 const filesystem = require('node:fs')
+const PORT = process.env.PORT || 5600
 
+const server = http.createServer(
+    (request, response)=>{
+        const filePath = getFilePath(request.url)
+        const statusCode = getStatusCode(filePath)
+
+        response.writeHead(statusCode,{'Content-Type': 'text/html'})
+        render(response, filePath)
+    }
+)
+
+server.listen(PORT, 'localhost' , () =>{
+    console.log(`Server running aT: http: //localhost:${PORT}`)
+})
 
 const getFilePath = (url) =>{
     const basepath = './views/'
@@ -13,6 +27,11 @@ const getFilePath = (url) =>{
             return basepath+'404.html'
     }
 }
+const getStatusCode = (filePath) =>{
+    if(filePath.includes('404.html'))
+        return 404
+    return 200
+}
 
 const render = (response, filePath) =>{
     filesystem.readFile(filePath, 
@@ -22,15 +41,3 @@ const render = (response, filePath) =>{
         }
     )
 }
-
-const server = http.createServer((request, response)=>{
-    response.writeHead(200,{'Content-Type': 'text/html'})
-    const filePath = getFilePath(request.url)
-    render(response, filePath)
-})
-
-const PORT = process.env.PORT || 5600
-
-server.listen(PORT, 'localhost' , () =>{
-    console.log(`Server running aT: http: //localhost:${PORT}`)
-})
