@@ -4,11 +4,16 @@ const PORT = process.env.PORT || 5600
 
 const server = http.createServer(
     (request, response)=>{
-        const filePath = getFilePath(request.url)
-        const statusCode = getStatusCode(filePath)
-
-        response.writeHead(statusCode,{'Content-Type': 'text/html'})
-        render(response, filePath)
+        if(request.url === '/about-me'){
+            redirect(response, '/about')
+            
+        } else {
+            const filePath = getFilePath(request.url)
+            const statusCode = getStatusCode(filePath)
+    
+            response.writeHead(statusCode,{'Content-Type': 'text/html'})
+            render(response, filePath)
+        }
     }
 )
 
@@ -40,4 +45,8 @@ const render = (response, filePath) =>{
             response.end(content)
         }
     )
+}
+
+const redirect = (response, to) =>{
+    response.setHeader('Location', to)
 }
